@@ -1,13 +1,21 @@
-const { connect, connection } = require('mongoose');
+const express = require('express');
+const mongoose = require('mongoose')
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-// After you create your Heroku application, visit https://dashboard.heroku.com/apps/ select the application name and add your Atlas connection string as a Config Var
-// Node will look for this environment variable and if it exists, it will use it. Otherwise, it will assume that you are running this application locally
-const connectionString =
-  process.env.MONGODB_URI || 'mongodb://localhost:27017/studentsDB';
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
-connect(connectionString, {
+app.use(require('./routes'));
+
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost/social_network', {
+  useFindAndModify: false,
   useNewUrlParser: true,
-  useUnifiedTopology: true,
+  useUnifiedTopology: true
 });
 
-module.exports = connection;
+// Use this to log mongo queries being executed!
+mongoose.set('debug', true);
+
+app.listen(PORT, () => console.log(`🌍 Connected on localhost:${PORT}`));
